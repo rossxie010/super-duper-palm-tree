@@ -1,0 +1,78 @@
+-- 1. Users Table: Stores user account information.
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Not Prerequsites in this case',
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Stocks Table: Stores static information about a company's stock.
+CREATE TABLE Stocks (
+    stock_id INT AUTO_INCREMENT PRIMARY KEY,
+    symbol VARCHAR(10) NOT NULL UNIQUE, -- e.g., 'AAPL'
+    company_name VARCHAR(255) NOT NULL,
+    exchange VARCHAR(50), -- e.g., 'NASDAQ' 'Dow Jones' 'S&P 500'(Enum type)
+    currency CHAR(3) NOT NULL DEFAULT 'USD', -- e.g., 'USD'
+    last_updated DATETIME
+);
+
+-- 3. Portfolios Table: Each user can have multiple portfolios (e.g., 'Long-Term', 'Tech Growth').
+CREATE TABLE Portfolios (
+    portfolio_id INT AUTO_INCREMENT PRIMARY KEY, --auto-increment primary key could be shed in this case.
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 4. Transactions Table: Records every buy and sell action.
+CREATE TABLE Transactions (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    type ENUM('BUY', 'SELL') NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    price DECIMAL(15, 4) NOT NULL CHECK (price >= 0), -- Price per share
+    fee DECIMAL(10, 2) DEFAULT 0, -- Commission or fee for the transaction
+    transaction_date DATETIME NOT NULL, -- The date the transaction occurred in the market
+    recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- When it was recorded in the DB
+    FOREIGN KEY (portfolio_id) REFERENCES Portfolios(portfolio_id) ON DELETE CASCADE, --delete cascade action might not be further constrained here(works for all DDLS as follows)
+    FOREIGN KEY (stock_id) REFERENCES Stocks(stock_id)
+);
+
+-- 5. Stock_Price_History Table: Time-series data of stock prices.(Considering using Polars library)
+CREATE TABLE Stock_Price_History (
+    price_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    stock_id INT NOT NULL,
+    price DECIMAL(15, 4) NOT NULL,
+    timestamp DATETIME NOT NULL,
+    FOREIGN KEY (stock_id) REFERENCES Stocks(stock_id) ON DELETE CASCADE
+);
+
+-- 6. Watchlists Table: Users can create multiple watchlists to monitor stocks.
+CREATE TABLE Watchlists (
+    watchlist_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 7. Watchlist_Items Table: The stocks contained within a watchlist.
+CREATE TABLE Watchlist_Items (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    watchlist_id INT NOT NULL,
+    stock_id INT NOT NULL,
+    added_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (watchlist_id) REFERENCES Watchlists(watchlist_id) ON DELETE CASCADE,
+    FOREIGN KEY (stock_id) REFERENCES Stocks(stock_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_watchlist_stock (watchlist_id, stock_id)
+);
+
+
+
+CREATE INDEX idx_transactions_portfolio ON Transactions(portfolio_id);
+CREATE INDEX idx_transactions_stock ON Transactions(stock_id);
+CREATE INDEX idx_price_history_stock_time ON Stock_Price_History(stock_id, timestamp DESC);
+CREATE INDEX idx_watchlist_items_stock ON Watchlist_Items(stock_id);
