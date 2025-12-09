@@ -2,5 +2,48 @@ This stock watcher database application aims to help with understanding the trad
 
 Available connections: Binance, MT4, MT5, FIX/FAST, PolygonIO, Trading Technologies, Alpaca Markets, BarChart, CQG, E*Trade, IQFeed, InteractiveBrokers, LMAX, MatLab, Oanda, FXCM, Rithmic, cTrader, DXtrade, BitStamp, Bitfinex, Coinbase, Kraken, Poloniex, GDAX, Bittrex, Bithumb, OKX, Coincheck, CEX.IO, BitMEX, YoBit, Livecoin, EXMO, Deribit, HTX, KuCoin, QuantFEED and many other.
 
-To run the applciation, plz make sure:
+Import your project into Eclipse (recommended)
+If you use Eclipse, you can simply import the generated project into Eclipse.
+
+In Eclipse, go to the File menu and choose:
+
+File -> Import... -> Existing Projects into Workspace
+
+Browse to the directory containing this file, select "StockWatcher".
+
+Be sure to uncheck "Copy projects into workspace" if it is checked.
+
+Click Finish.
+
+You can now browse the project in Eclipse.
+
+To launch your web app in GWT hosted mode, go to the Run menu and choose:
+
+Run -> Open Debug Dialog...
+
+Under Java Application, you should find a launch configuration named "StockWatcher". Select and click "Debug".
+
+You can now use the built-in debugger to debug your web app in hosted mode.
+
+To compile for web mode, just run your app in hosted mode and press the "Compile/Browse" button.
+
+Build from the command line with Ant
+If you prefer to work from the command line, you can use Ant to build your project. (http://ant.apache.org/) Ant uses the generated build.xml file which describes exactly how to build your project. This file has been tested to work against Ant 1.7.1. The following assumes ant is on your command line path.
+
+To run hosted mode, just type ant hosted.
+
+To compile your project for deployment, just type ant.
+
+To compile and also bundle into a .war file, type ant war.
+
+For a full listing of other targets, type ant -p.
+
+### Using another IDE
+
+GWT projects can be run in other IDEs as well, but will require some manual setup. If you go this route, be sure to:
+
+Have your IDE build .class files into war/WEB-INF/classes.
+Add gwt-user.jar and gwt-dev-.jar to your project build path.
+When creating a launch configuration, add a classpath entry for your src folder (this is somewhat unusual but GWT needs access to your source files).
+If you get stuck, try to mimic what the Ant build.xml would do.
 
